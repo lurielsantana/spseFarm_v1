@@ -1,0 +1,23 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Assinatura do Visual Studio Enterprise – MPN(bed82fbc-918c-4d3c-915a-a571bec7ee87)'
+    subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
+    action: 'DeleteRG'
+    resourceGroupName: 'tjsprg'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Assinatura do Visual Studio Enterprise – MPN(bed82fbc-918c-4d3c-915a-a571bec7ee87)'
+    subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
+    action: 'DeleteRG'
+    resourceGroupName: 'NetworkWatcherRG'
