@@ -4,16 +4,20 @@ trigger:
 pool:
   vmImage: windows-latest
 
-steps:
-- task: AzureResourceManagerTemplateDeployment@3
-  inputs:
-    deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: 'ARM Conn'
-    subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: 'TjspRG'
-    location: 'East US'
-    templateLocation: 'Linked artifact'
-    csmFile: 'azuredeploy.json'
-    csmParametersFile: 'azuredeploy.parameters.json'
-    deploymentMode: 'Incremental'
+jobs:
+  - job: createSp2019SingleFarm
+    timeoutInMinutes: 0
+    cancelTimeoutInMinutes: 1
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: 'ARM Conn'
+        subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'tjsprg'
+        location: 'East US'
+        templateLocation: 'URL of the file'
+        csmFileLink: 'https://raw.githubusercontent.com/macbgit/sp2019farm_v1/main/azuredeploy.json?token=AVE3YF2DGFGDIZTKPKOZEH3BUZ7ZC'
+        csmParametersFileLink: 'https://raw.githubusercontent.com/macbgit/sp2019farm_v1/main/azuredeploy.parameters.json?token=AVE3YF7ZXXMLRTACA6XOWE3BUZ74C'
+        deploymentMode: 'Incremental'
