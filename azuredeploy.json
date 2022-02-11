@@ -330,7 +330,7 @@
     },
     "_artifactsLocation": {
       "type": "string",
-      "defaultValue": "https://github.com/Azure/azure-devtestlab/raw/master/Environments/SharePoint-AllVersions",
+      "defaultValue": "https://github.com/macbgit/spseFarm_v1",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }
@@ -366,7 +366,7 @@
       "spAppPoolUserName": "spapppool",
       "spAppPoolPassword": "[parameters('serviceAccountsPassword')]",
       "spPassphrase": "[parameters('serviceAccountsPassword')]",
-      "localAdminUserName": "[concat('local-', uniqueString(subscription().subscriptionId))]",
+      "localAdminUserName": "[parameters('localadminusername')]",
       "enableAnalysis": false
     },
     "networkSettings": {
