@@ -5,7 +5,7 @@ pool:
   vmImage: windows-latest
 
 jobs:
-  - job: createSp2019SingleFarm
+  - job: createSPSESingleFarm
     timeoutInMinutes: 0
     cancelTimeoutInMinutes: 1
     steps:
