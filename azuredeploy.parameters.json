@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminusername": {
-      "value": "GEN-UNIQUE-10"
+      "value": "TjspAdmin"
     },
     "adminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "SharepointTjsp@2022"
     },
     "serviceAccountsPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "SharepointTjsp@2022"
     }
   }
 }
