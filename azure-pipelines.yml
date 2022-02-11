@@ -1,0 +1,19 @@
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'ARM Conn'
+    subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'TjspRG'
+    location: 'East US'
+    templateLocation: 'Linked artifact'
+    csmFile: 'azuredeploy.json'
+    csmParametersFile: 'azuredeploy.parameters.json'
+    deploymentMode: 'Incremental'
