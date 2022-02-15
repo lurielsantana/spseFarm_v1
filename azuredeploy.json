@@ -366,7 +366,7 @@
       "spAppPoolUserName": "spapppool",
       "spAppPoolPassword": "[parameters('serviceAccountsPassword')]",
       "spPassphrase": "[parameters('serviceAccountsPassword')]",
-      "localAdminUserName": "[parameters('localadminusername')]",
+      "localAdminUserName": "TjspLocalAdmin",
       "enableAnalysis": false
     },
     "networkSettings": {
