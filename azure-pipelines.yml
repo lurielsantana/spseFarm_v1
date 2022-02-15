@@ -18,6 +18,6 @@ jobs:
         resourceGroupName: 'tjsprg'
         location: 'East US'
         templateLocation: 'URL of the file'
-        csmFileLink: 'https://raw.githubusercontent.com/macbgit/sp2019farm_v1/main/azuredeploy.json?token=AVE3YF2DGFGDIZTKPKOZEH3BUZ7ZC'
-        csmParametersFileLink: 'https://raw.githubusercontent.com/macbgit/sp2019farm_v1/main/azuredeploy.parameters.json?token=AVE3YF7ZXXMLRTACA6XOWE3BUZ74C'
+        csmFileLink: 'https://raw.githubusercontent.com/macbgit/spseFarm_v1/main/azuredeploy.json'
+        csmParametersFileLink: 'https://raw.githubusercontent.com/macbgit/spseFarm_v1/main/azuredeploy.parameters.json'
         deploymentMode: 'Incremental'
