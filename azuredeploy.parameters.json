@@ -10,9 +10,6 @@
     },
     "serviceAccountsPassword": {
       "value": "SharepointTjsp@2022"
-    },
-    "localadminusername": {
-      "value": "TjspLocalAdmin"
     }
   }
 }
