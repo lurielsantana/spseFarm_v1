@@ -4,7 +4,7 @@ configuration ConfigureSPVM
     (
         [Parameter(Mandatory)] [String]$DNSServer,
         [Parameter(Mandatory)] [String]$DomainFQDN,
-        [Parameter(Mandatory)] [String]$DCName,
+        [Parameter(Mandatory)] [String]$ADName,
         [Parameter(Mandatory)] [String]$SQLName,
         [Parameter(Mandatory)] [String]$SQLAlias,
         [Parameter(Mandatory)] [String]$SharePointVersion,
