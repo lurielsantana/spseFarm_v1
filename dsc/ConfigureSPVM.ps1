@@ -31,7 +31,7 @@ configuration ConfigureSPVM
     [String] $ComputerName = Get-Content env:computername
     #[String] $ServiceAppPoolName = "SharePoint Service Applications"
     [String] $SetupPath = "C:\Setup"
-    [String] $DCSetupPath = "\\$DCName\C$\Setup"
+    [String] $DCSetupPath = "\\$ADName\C$\Setup"
     [String] $TrustedIdChar = "e"
     [String] $SPTeamSiteTemplate = "STS#3"
     if ([String]::Equals($SharePointVersion, "2013") -or [String]::Equals($SharePointVersion, "2016")) {
@@ -384,7 +384,7 @@ configuration ConfigureSPVM
         {
             Name                 = $SPTrustedSitesName
             Zone                 = $DomainFQDN
-            DnsServer            = $DCName
+            DnsServer            = $ADName
             Target               = "$ComputerName.$DomainFQDN"
             Type                 = "CName"
             Ensure               = "Present"
@@ -706,8 +706,8 @@ configuration ConfigureSPVM
                 TestScript           = 
                 {
                     $domainNetbiosName = $using:DomainNetbiosName
-                    $dcName = $using:DCName
-                    $rootCAName = "$domainNetbiosName-$dcName-CA"
+                    $ADName = $using:ADName
+                    $rootCAName = "$domainNetbiosName-$ADName-CA"
                     $cert = Get-ChildItem -Path "cert:\LocalMachine\Root\" -DnsName "$rootCAName"
                     
                     if ($null -eq $cert) {
@@ -722,8 +722,8 @@ configuration ConfigureSPVM
 
             CertReq GenerateMainWebAppCertificate
             {
-                CARootName             = "$DomainNetbiosName-$DCName-CA"
-                CAServerFQDN           = "$DCName.$DomainFQDN"
+                CARootName             = "$DomainNetbiosName-$ADName-CA"
+                CAServerFQDN           = "$ADName.$DomainFQDN"
                 Subject                = "$SPTrustedSitesName.$DomainFQDN"
                 SubjectAltName         = "dns=*.$DomainFQDN"
                 KeyLength              = '2048'
@@ -888,7 +888,7 @@ $SPAppPoolCreds = Get-Credential -Credential "spapppool"
 $SPPassphraseCreds = Get-Credential -Credential "Passphrase"
 $DNSServer = "10.1.1.4"
 $DomainFQDN = "contoso.local"
-$DCName = "DC"
+$ADName = "DC"
 $SQLName = "SQL"
 $SQLAlias = "SQLAlias"
 $SharePointVersion = "2019"
@@ -896,7 +896,7 @@ $ConfigureADFS = $false
 $EnableAnalysis = $true
 
 $outputPath = "C:\Packages\Plugins\Microsoft.Powershell.DSC\2.83.2.0\DSCWork\ConfigureSPVM.0\ConfigureSPVM"
-ConfigureSPVM -DomainAdminCreds $DomainAdminCreds -SPSetupCreds $SPSetupCreds -SPFarmCreds $SPFarmCreds -SPAppPoolCreds $SPAppPoolCreds -SPPassphraseCreds $SPPassphraseCreds -DNSServer $DNSServer -DomainFQDN $DomainFQDN -DCName $DCName -SQLName $SQLName -SQLAlias $SQLAlias -SharePointVersion $SharePointVersion -ConfigureADFS $ConfigureADFS -EnableAnalysis $EnableAnalysis -ConfigurationData @{AllNodes=@(@{ NodeName="localhost"; PSDscAllowPlainTextPassword=$true })} -OutputPath $outputPath
+ConfigureSPVM -DomainAdminCreds $DomainAdminCreds -SPSetupCreds $SPSetupCreds -SPFarmCreds $SPFarmCreds -SPAppPoolCreds $SPAppPoolCreds -SPPassphraseCreds $SPPassphraseCreds -DNSServer $DNSServer -DomainFQDN $DomainFQDN -ADName $ADName -SQLName $SQLName -SQLAlias $SQLAlias -SharePointVersion $SharePointVersion -ConfigureADFS $ConfigureADFS -EnableAnalysis $EnableAnalysis -ConfigurationData @{AllNodes=@(@{ NodeName="localhost"; PSDscAllowPlainTextPassword=$true })} -OutputPath $outputPath
 Set-DscLocalConfigurationManager -Path $outputPath
 Start-DscConfiguration -Path $outputPath -Wait -Verbose -Force
 
