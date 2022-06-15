@@ -4,7 +4,7 @@ configuration ConfigureSPVM
     (
         [Parameter(Mandatory)] [String]$DNSServer,
         [Parameter(Mandatory)] [String]$DomainFQDN,
-        [Parameter(Mandatory)] [String]$ADName,
+        [Parameter(Mandatory)] [String]$DCName,
         [Parameter(Mandatory)] [String]$SQLName,
         [Parameter(Mandatory)] [String]$SQLAlias,
         [Parameter(Mandatory)] [String]$SharePointVersion,
@@ -31,7 +31,7 @@ configuration ConfigureSPVM
     [String] $ComputerName = Get-Content env:computername
     #[String] $ServiceAppPoolName = "SharePoint Service Applications"
     [String] $SetupPath = "C:\Setup"
-    [String] $DCSetupPath = "\\$ADName\C$\Setup"
+    [String] $DCSetupPath = "\\$DCName\C$\Setup"
     [String] $TrustedIdChar = "e"
     [String] $SPTeamSiteTemplate = "STS#3"
     if ([String]::Equals($SharePointVersion, "2013") -or [String]::Equals($SharePointVersion, "2016")) {
@@ -205,26 +205,26 @@ configuration ConfigureSPVM
             InstallDir = "C:\Choco"
         }
 
-        cChocoPackageInstaller InstallEdge
-        {
-            Name                 = "microsoft-edge"
-            Ensure               = "Present"
-            DependsOn            = "[cChocoInstaller]InstallChoco"
-        }
+        #cChocoPackageInstaller InstallEdge
+        #{
+        #    Name                 = "microsoft-edge"
+        #    Ensure               = "Present"
+        #    DependsOn            = "[cChocoInstaller]InstallChoco"
+        #}
 
-        cChocoPackageInstaller InstallNotepadpp
-        {
-            Name                 = "notepadplusplus.install"
-            Ensure               = "Present"
-            DependsOn            = "[cChocoInstaller]InstallChoco"
-        }
+        #cChocoPackageInstaller InstallNotepadpp
+        #{
+        #    Name                 = "notepadplusplus.install"
+        #    Ensure               = "Present"
+        #    DependsOn            = "[cChocoInstaller]InstallChoco"
+        #}
 
-        cChocoPackageInstaller Install7zip
-        {
-            Name                 = "7zip.install"
-            Ensure               = "Present"
-            DependsOn            = "[cChocoInstaller]InstallChoco"
-        }
+        #cChocoPackageInstaller Install7zip
+        #{
+        #    Name                 = "7zip.install"
+        #    Ensure               = "Present"
+        #    DependsOn            = "[cChocoInstaller]InstallChoco"
+        #}
 
         cChocoPackageInstaller InstallVscode
         {
@@ -384,7 +384,7 @@ configuration ConfigureSPVM
         {
             Name                 = $SPTrustedSitesName
             Zone                 = $DomainFQDN
-            DnsServer            = $ADName
+            DnsServer            = $DCName
             Target               = "$ComputerName.$DomainFQDN"
             Type                 = "CName"
             Ensure               = "Present"
@@ -403,7 +403,7 @@ configuration ConfigureSPVM
             UserPrincipalName             = "$($SPSetupCreds.UserName)@$DomainFQDN"
             PasswordNeverExpires          = $true
             Ensure                        = "Present"
-            PsDscRunAsCredential = $DomainAdminCredsQualified
+            PsDscRunAsCredential 		= $DomainAdminCredsQualified
             DependsOn                     = "[PendingReboot]RebootOnSignalFromJoinDomain"
         }        
 
@@ -415,7 +415,7 @@ configuration ConfigureSPVM
             Password                      = $SPFarmCreds
             PasswordNeverExpires          = $true
             Ensure                        = "Present"
-            PsDscRunAsCredential = $DomainAdminCredsQualified
+            PsDscRunAsCredential 		= $DomainAdminCredsQualified
             DependsOn                     = "[PendingReboot]RebootOnSignalFromJoinDomain"
         }
 
@@ -706,8 +706,8 @@ configuration ConfigureSPVM
                 TestScript           = 
                 {
                     $domainNetbiosName = $using:DomainNetbiosName
-                    $ADName = $using:ADName
-                    $rootCAName = "$domainNetbiosName-$ADName-CA"
+                    $dcName = $using:DCName
+                    $rootCAName = "$domainNetbiosName-$dcName-CA"
                     $cert = Get-ChildItem -Path "cert:\LocalMachine\Root\" -DnsName "$rootCAName"
                     
                     if ($null -eq $cert) {
@@ -722,8 +722,8 @@ configuration ConfigureSPVM
 
             CertReq GenerateMainWebAppCertificate
             {
-                CARootName             = "$DomainNetbiosName-$ADName-CA"
-                CAServerFQDN           = "$ADName.$DomainFQDN"
+                CARootName             = "$DomainNetbiosName-$DCName-CA"
+                CAServerFQDN           = "$DCName.$DomainFQDN"
                 Subject                = "$SPTrustedSitesName.$DomainFQDN"
                 SubjectAltName         = "dns=*.$DomainFQDN"
                 KeyLength              = '2048'
@@ -881,22 +881,22 @@ function Get-NetBIOSName
 Install-Module -Name PendingReboot
 help ConfigureSPVM
 
-$DomainAdminCreds = Get-Credential -Credential "yvand"
+$DomainAdminCreds = Get-Credential -Credential "TjspLocalAdmin"
 $SPSetupCreds = Get-Credential -Credential "spsetup"
 $SPFarmCreds = Get-Credential -Credential "spfarm"
 $SPAppPoolCreds = Get-Credential -Credential "spapppool"
 $SPPassphraseCreds = Get-Credential -Credential "Passphrase"
-$DNSServer = "10.1.1.4"
-$DomainFQDN = "contoso.local"
-$ADName = "DC"
+$DNSServer = "10.0.0.4"
+$DomainFQDN = "redetjsp.local"
+$DCName = "DC"
 $SQLName = "SQL"
 $SQLAlias = "SQLAlias"
-$SharePointVersion = "2019"
+$SharePointVersion = "Subscription"
 $ConfigureADFS = $false
 $EnableAnalysis = $true
 
 $outputPath = "C:\Packages\Plugins\Microsoft.Powershell.DSC\2.83.2.0\DSCWork\ConfigureSPVM.0\ConfigureSPVM"
-ConfigureSPVM -DomainAdminCreds $DomainAdminCreds -SPSetupCreds $SPSetupCreds -SPFarmCreds $SPFarmCreds -SPAppPoolCreds $SPAppPoolCreds -SPPassphraseCreds $SPPassphraseCreds -DNSServer $DNSServer -DomainFQDN $DomainFQDN -ADName $ADName -SQLName $SQLName -SQLAlias $SQLAlias -SharePointVersion $SharePointVersion -ConfigureADFS $ConfigureADFS -EnableAnalysis $EnableAnalysis -ConfigurationData @{AllNodes=@(@{ NodeName="localhost"; PSDscAllowPlainTextPassword=$true })} -OutputPath $outputPath
+ConfigureSPVM -DomainAdminCreds $DomainAdminCreds -SPSetupCreds $SPSetupCreds -SPFarmCreds $SPFarmCreds -SPAppPoolCreds $SPAppPoolCreds -SPPassphraseCreds $SPPassphraseCreds -DNSServer $DNSServer -DomainFQDN $DomainFQDN -DCName $DCName -SQLName $SQLName -SQLAlias $SQLAlias -SharePointVersion $SharePointVersion -ConfigureADFS $ConfigureADFS -EnableAnalysis $EnableAnalysis -ConfigurationData @{AllNodes=@(@{ NodeName="localhost"; PSDscAllowPlainTextPassword=$true })} -OutputPath $outputPath
 Set-DscLocalConfigurationManager -Path $outputPath
 Start-DscConfiguration -Path $outputPath -Wait -Verbose -Force
 

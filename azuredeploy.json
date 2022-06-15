@@ -20,27 +20,6 @@
         "description": "Specify if a SharePoint Subscription farm should be provisioned."
       }
     },
-    "provisionSharePoint2019": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Specify if a SharePoint 2019 farm should be provisioned."
-      }
-    },
-    "provisionSharePoint2016": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Specify if a SharePoint 2016 farm should be provisioned."
-      }
-    },
-    "provisionSharePoint2013": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Specify if a SharePoint 2013 farm should be provisioned."
-      }
-    },
     "domainFQDN": {
       "type": "string",
       "defaultValue": "redetjsp.local",
@@ -101,7 +80,7 @@
     },
     "vmsTimeZone": {
       "type": "string",
-      "defaultValue": "Romance Standard Time",
+      "defaultValue": "Central Brazilian Standard Time",
       "allowedValues": [
         "Dateline Standard Time",
         "UTC-11",
@@ -330,7 +309,7 @@
     },
     "_artifactsLocation": {
       "type": "string",
-      "defaultValue": "[deployment().properties.templateLink.uri]",
+      "defaultValue": "$(Build.ArtifactStagingDirectory)",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
       }
@@ -346,11 +325,7 @@
   "variables": {
     "_artifactsLocationWithTrailingSlash": "[concat(parameters('_artifactsLocation'), '/blob/')]",
     "generalSettings": {
-      "vmDCName": "DC",
       "vmSQLName": "SQL",
-      "vmSP2013Name": "SP2013",
-      "vmSP2016Name": "SP2016",
-      "vmSP2019Name": "SP2019",
       "vmSPSubscriptionName": "SPSubscription",
       "sqlAlias": "SQLAlias",
       "spSuperUserName": "spSuperUser",
@@ -379,23 +354,10 @@
       "subnetSQLPrefix": "10.1.2.0/24",
       "subnetSPName": "Subnet-SP",
       "subnetSPPrefix": "10.1.3.0/24",
-      "nsgSubnetDCName": "NSG-Subnet-DC",
       "nsgSubnetSQLName": "NSG-Subnet-SQL",
       "nsgSubnetSPName": "NSG-Subnet-SP",
-      "vmDCPublicIPNicAssociation": {
-        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmDC').vmPublicIPName)]"
-      },
       "vmSQLPublicIPNicAssociation": {
         "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSQL').vmPublicIPName)]"
-      },
-      "vmSP2013PublicIPNicAssociation": {
-        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2013').vmPublicIPName)]"
-      },
-      "vmSP2016PublicIPNicAssociation": {
-        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2016').vmPublicIPName)]"
-      },
-      "vmSP2019PublicIPNicAssociation": {
-        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2019').vmPublicIPName)]"
       },
       "vmSPSubscriptionPublicIPNicAssociation": {
         "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSPSubscription').vmPublicIPName)]"
@@ -417,17 +379,6 @@
         }
       ]
     },
-    "vmDC": {
-      "vmImagePublisher": "MicrosoftWindowsServer",
-      "vmImageOffer": "WindowsServer",
-      "vmImageSKU": "2022-datacenter-azure-edition-smalldisk",
-      "vmOSDiskName": "Disk-DC-OS",
-      "vmVmSize": "[parameters('vmDCSize')]",
-      "vmNicName": "[concat('NIC-', variables('generalSettings').vmDCName, '-0')]",
-      "vmPublicIPName": "[concat('PublicIP-', variables('generalSettings').vmDCName)]",
-      "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmDCName), '_', '-'))]",
-      "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmDCName)]"
-    },
     "vmSQL": {
       "vmImagePublisher": "MicrosoftSQLServer",
       "vmImageOffer": "sql2019-ws2022",
@@ -439,39 +390,6 @@
       "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmSQLName), '_', '-'))]",
       "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmSQLName)]"
     },
-    "vmSP2013": {
-      "vmImagePublisher": "MicrosoftSharePoint",
-      "vmImageOffer": "MicrosoftSharePointServer",
-      "vmImageSKU": "sp2013",
-      "vmOSDiskName": "Disk-SP2013-OS",
-      "vmVmSize": "[parameters('vmSPSize')]",
-      "vmNicName": "[concat('NIC-', variables('generalSettings').vmSP2013Name, '-0')]",
-      "vmPublicIPName": "[concat('PublicIP-', variables('generalSettings').vmSP2013Name)]",
-      "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmSP2013Name), '_', '-'))]",
-      "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmSP2013Name)]"
-    },
-    "vmSP2016": {
-      "vmImagePublisher": "MicrosoftSharePoint",
-      "vmImageOffer": "MicrosoftSharePointServer",
-      "vmImageSKU": "sp2016",
-      "vmOSDiskName": "Disk-SP2016-OS",
-      "vmVmSize": "[parameters('vmSPSize')]",
-      "vmNicName": "[concat('NIC-', variables('generalSettings').vmSP2016Name, '-0')]",
-      "vmPublicIPName": "[concat('PublicIP-', variables('generalSettings').vmSP2016Name)]",
-      "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmSP2016Name), '_', '-'))]",
-      "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmSP2016Name)]"
-    },
-    "vmSP2019": {
-      "vmImagePublisher": "MicrosoftSharePoint",
-      "vmImageOffer": "MicrosoftSharePointServer",
-      "vmImageSKU": "sp2019",
-      "vmOSDiskName": "Disk-SP2019-OS",
-      "vmVmSize": "[parameters('vmSPSize')]",
-      "vmNicName": "[concat('NIC-', variables('generalSettings').vmSP2019Name, '-0')]",
-      "vmPublicIPName": "[concat('PublicIP-', variables('generalSettings').vmSP2019Name)]",
-      "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmSP2019Name), '_', '-'))]",
-      "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmSP2019Name)]"
-    },
     "vmSPSubscription": {
       "vmImagePublisher": "MicrosoftWindowsServer",
       "vmImageOffer": "WindowsServer",
@@ -482,12 +400,6 @@
       "vmPublicIPName": "[concat('PublicIP-', variables('generalSettings').vmSPSubscriptionName)]",
       "vmPublicIPDnsName": "[toLower(replace(concat(resourceGroup().name, '-', variables('generalSettings').vmSPSubscriptionName), '_', '-'))]",
       "shutdownResourceName": "[concat('shutdown-computevm-', variables('generalSettings').vmSPSubscriptionName)]"
-    },
-    "dscConfigureDCVM": {
-      "scriptFileUri": "https://github.com/macbgit/spseFarm_v1/blob/main/dsc/ConfigureDCVM.zip?raw=true",
-      "script": "ConfigureDCVM.ps1",
-      "function": "ConfigureDCVM",
-      "forceUpdateTag": "1.0"
     },
     "dscConfigureSQLVM": {
       "scriptFileUri": "https://github.com/macbgit/spseFarm_v1/blob/main/dsc/ConfigureSQLVM.zip?raw=true",
@@ -549,7 +461,6 @@
       "location": "[parameters('location')]",
       "apiVersion": "2021-02-01",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSettings').nsgSubnetDCName)]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSettings').nsgSubnetSQLName)]",
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSettings').nsgSubnetSPName)]"
       ],
@@ -563,15 +474,6 @@
           ]
         },
         "subnets": [
-          {
-            "name": "[variables('networkSettings').subnetDCName]",
-            "properties": {
-              "addressPrefix": "[variables('networkSettings').subnetDCPrefix]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSettings').nsgSubnetDCName)]"
-              }
-            }
-          },
           {
             "name": "[variables('networkSettings').subnetSQLName]",
             "properties": {
@@ -592,160 +494,6 @@
           }
         ]
       }
-    },
-    {
-      "condition": "[equals(parameters('addPublicIPAddressToEachVM'), true())]",
-      "name": "[variables('vmDC').vmPublicIPName]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "tags": {
-        "displayName": "[variables('vmDC').vmPublicIPName]"
-      },
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('vmDC').vmPublicIPDnsName]"
-        }
-      }
-    },
-    {
-      "name": "[variables('vmDC').vmNicName]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').vNetPrivateName)]",
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmDC').vmPublicIPName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('vmDC').vmNicName]"
-      },
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "[variables('networkSettings').dcPrivateIPAddress]",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('networkSettings').vNetPrivateName, variables('networkSettings').subnetDCName)]"
-              },
-              "publicIPAddress": "[if(parameters('addPublicIPAddressToEachVM'), variables('networkSettings').vmDCPublicIPNicAssociation, json('null'))]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[variables('generalSettings').vmDCName]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDC').vmNicName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('generalSettings').vmDCName]"
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmDC').vmVmSize]"
-        },
-        "osProfile": {
-          "computerName": "[variables('generalSettings').vmDCName]",
-          "adminUsername": "[parameters('adminUserName')]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "timeZone": "[parameters('vmsTimeZone')]",
-            "enableAutomaticUpdates": "[parameters('enableAutomaticUpdates')]",
-            "provisionVMAgent": true,
-            "patchSettings": {
-              "patchMode": "[if(parameters('enableAutomaticUpdates'), 'AutomaticByOS', 'Manual')]",
-              "assessmentMode": "ImageDefault"
-            }
-          }
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('vmDC').vmImagePublisher]",
-            "offer": "[variables('vmDC').vmImageOffer]",
-            "sku": "[variables('vmDC').vmImageSKU]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('vmDC').vmOSDiskName]",
-            "caching": "ReadWrite",
-            "osType": "Windows",
-            "createOption": "FromImage",
-            "diskSizeGB": 32,
-            "managedDisk": {
-              "storageAccountType": "[parameters('vmDCStorageAccountType')]"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmDC').vmNicName)]"
-            }
-          ]
-        },
-        "licenseType": "[if(parameters('enableHybridBenefitServerLicenses'), 'Windows_Server', json('null'))]"
-      },
-      "resources": [
-        {
-          "name": "ConfigureDCVM",
-          "type": "extensions",
-          "location": "[parameters('location')]",
-          "apiVersion": "2021-04-01",
-          "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', variables('generalSettings').vmDCName)]"
-          ],
-          "tags": {
-            "displayName": "ConfigureDCVM"
-          },
-          "properties": {
-            "publisher": "Microsoft.Powershell",
-            "type": "DSC",
-            "typeHandlerVersion": "2.9",
-            "autoUpgradeMinorVersion": true,
-            "forceUpdateTag": "[variables('dscConfigureDCVM').forceUpdateTag]",
-            "settings": {
-              "wmfVersion": "latest",
-              "configuration": {
-                "url": "[variables('dscConfigureDCVM').scriptFileUri]",
-                "script": "[variables('dscConfigureDCVM').script]",
-                "function": "[variables('dscConfigureDCVM').function]"
-              },
-              "configurationArguments": {
-                "domainFQDN": "[parameters('domainFQDN')]",
-                "PrivateIP": "[variables('networkSettings').dcPrivateIPAddress]",
-                "ConfigureADFS": "[parameters('configureADFS')]"
-              },
-              "privacy": {
-                "dataCollection": "enable"
-              }
-            },
-            "protectedSettings": {
-              "configurationArguments": {
-                "AdminCreds": {
-                  "UserName": "[parameters('adminUserName')]",
-                  "Password": "[parameters('adminPassword')]"
-                },
-                "AdfsSvcCreds": {
-                  "UserName": "[variables('generalSettings').adfsSvcUserName]",
-                  "Password": "[variables('generalSettings').adfsSvcPassword]"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     {
       "condition": "[equals(parameters('addPublicIPAddressToEachVM'), true())]",
@@ -902,523 +650,7 @@
         }
       }
     },
-    {
-      "condition": "[and(equals(parameters('provisionSharePoint2013'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "name": "[variables('vmSP2013').vmPublicIPName]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "tags": {
-        "displayName": "[variables('vmSP2013').vmPublicIPName]"
-      },
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('vmSP2013').vmPublicIPDnsName]"
-        }
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2013'), true())]",
-      "name": "[variables('vmSP2013').vmNicName]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').vNetPrivateName)]",
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2013').vmPublicIPName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('vmSP2013').vmNicName]"
-      },
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('networkSettings').vNetPrivateName, variables('networkSettings').subnetSPName)]"
-              },
-              "publicIPAddress": "[if(parameters('addPublicIPAddressToEachVM'), variables('networkSettings').vmSP2013PublicIPNicAssociation, json('null'))]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2013'), true())]",
-      "name": "[variables('generalSettings').vmSP2013Name]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2013').vmNicName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('generalSettings').vmSP2013Name]"
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmSP2013').vmVmSize]"
-        },
-        "osProfile": {
-          "computerName": "[variables('generalSettings').vmSP2013Name]",
-          "adminUsername": "[variables('generalSettings').localAdminUserName]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "timeZone": "[parameters('vmsTimeZone')]",
-            "enableAutomaticUpdates": "[parameters('enableAutomaticUpdates')]",
-            "provisionVMAgent": true,
-            "patchSettings": {
-              "patchMode": "[if(parameters('enableAutomaticUpdates'), 'AutomaticByOS', 'Manual')]",
-              "assessmentMode": "ImageDefault"
-            }
-          }
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('vmSP2013').vmImagePublisher]",
-            "offer": "[variables('vmSP2013').vmImageOffer]",
-            "sku": "[variables('vmSP2013').vmImageSKU]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('vmSP2013').vmOSDiskName]",
-            "caching": "ReadWrite",
-            "osType": "Windows",
-            "createOption": "FromImage",
-            "diskSizeGB": 128,
-            "managedDisk": {
-              "storageAccountType": "[parameters('vmSPStorageAccountType')]"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2013').vmNicName)]"
-            }
-          ]
-        },
-        "licenseType": "[if(parameters('enableHybridBenefitServerLicenses'), 'Windows_Server', json('null'))]"
-      },
-      "resources": []
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2013'), true())]",
-      "name": "[concat(variables('generalSettings').vmSP2013Name, '/ConfigureSPVM')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', variables('generalSettings').vmSP2013Name)]"
-      ],
-      "tags": {
-        "displayName": "[concat(variables('generalSettings').vmSP2013Name, '/ConfigureSPVM')]"
-      },
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.9",
-        "autoUpgradeMinorVersion": true,
-        "forceUpdateTag": "[variables('dscConfigureSPVM').forceUpdateTag]",
-        "settings": {
-          "wmfVersion": "latest",
-          "configuration": {
-            "url": "[variables('dscConfigureSPVM').scriptFileUri]",
-            "script": "[variables('dscConfigureSPVM').script]",
-            "function": "[variables('dscConfigureSPVM').function]"
-          },
-          "configurationArguments": {
-            "DNSServer": "[variables('networkSettings').dcPrivateIPAddress]",
-            "DomainFQDN": "[parameters('domainFQDN')]",
-            "DCName": "[variables('generalSettings').vmDCName]",
-            "SQLName": "[variables('generalSettings').vmSQLName]",
-            "SQLAlias": "[variables('generalSettings').sqlAlias]",
-            "SharePointVersion": "2013",
-            "ConfigureADFS": "[parameters('configureADFS')]",
-            "EnableAnalysis": "[variables('generalSettings').enableAnalysis]"
-          },
-          "privacy": {
-            "dataCollection": "enable"
-          }
-        },
-        "protectedSettings": {
-          "configurationArguments": {
-            "DomainAdminCreds": {
-              "UserName": "[parameters('adminUserName')]",
-              "Password": "[parameters('adminPassword')]"
-            },
-            "SPSetupCreds": {
-              "UserName": "[variables('generalSettings').spSetupUserName]",
-              "Password": "[variables('generalSettings').spSetupPassword]"
-            },
-            "SPFarmCreds": {
-              "UserName": "[variables('generalSettings').spFarmUserName]",
-              "Password": "[variables('generalSettings').spFarmPassword]"
-            },
-            "SPAppPoolCreds": {
-              "UserName": "[variables('generalSettings').spAppPoolUserName]",
-              "Password": "[variables('generalSettings').spAppPoolPassword]"
-            },
-            "SPPassphraseCreds": {
-              "UserName": "Passphrase",
-              "Password": "[variables('generalSettings').spPassphrase]"
-            }
-          }
-        }
-      }
-    },
-    {
-      "condition": "[and(equals(parameters('provisionSharePoint2016'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "name": "[variables('vmSP2016').vmPublicIPName]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "tags": {
-        "displayName": "[variables('vmSP2016').vmPublicIPName]"
-      },
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('vmSP2016').vmPublicIPDnsName]"
-        }
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2016'), true())]",
-      "name": "[variables('vmSP2016').vmNicName]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').vNetPrivateName)]",
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2016').vmPublicIPName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('vmSP2016').vmNicName]"
-      },
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('networkSettings').vNetPrivateName, variables('networkSettings').subnetSPName)]"
-              },
-              "publicIPAddress": "[if(parameters('addPublicIPAddressToEachVM'), variables('networkSettings').vmSP2016PublicIPNicAssociation, json('null'))]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2016'), true())]",
-      "name": "[variables('generalSettings').vmSP2016Name]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2016').vmNicName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('generalSettings').vmSP2016Name]"
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmSP2016').vmVmSize]"
-        },
-        "osProfile": {
-          "computerName": "[variables('generalSettings').vmSP2016Name]",
-          "adminUsername": "[variables('generalSettings').localAdminUserName]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "timeZone": "[parameters('vmsTimeZone')]",
-            "enableAutomaticUpdates": "[parameters('enableAutomaticUpdates')]",
-            "provisionVMAgent": true,
-            "patchSettings": {
-              "patchMode": "[if(parameters('enableAutomaticUpdates'), 'AutomaticByOS', 'Manual')]",
-              "assessmentMode": "ImageDefault"
-            }
-          }
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('vmSP2016').vmImagePublisher]",
-            "offer": "[variables('vmSP2016').vmImageOffer]",
-            "sku": "[variables('vmSP2016').vmImageSKU]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('vmSP2016').vmOSDiskName]",
-            "caching": "ReadWrite",
-            "osType": "Windows",
-            "createOption": "FromImage",
-            "diskSizeGB": 128,
-            "managedDisk": {
-              "storageAccountType": "[parameters('vmSPStorageAccountType')]"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2016').vmNicName)]"
-            }
-          ]
-        },
-        "licenseType": "[if(parameters('enableHybridBenefitServerLicenses'), 'Windows_Server', json('null'))]"
-      },
-      "resources": []
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2016'), true())]",
-      "name": "[concat(variables('generalSettings').vmSP2016Name, '/ConfigureSPVM')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', variables('generalSettings').vmSP2016Name)]"
-      ],
-      "tags": {
-        "displayName": "[concat(variables('generalSettings').vmSP2016Name, '/ConfigureSPVM')]"
-      },
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.9",
-        "autoUpgradeMinorVersion": true,
-        "forceUpdateTag": "[variables('dscConfigureSPVM').forceUpdateTag]",
-        "settings": {
-          "wmfVersion": "latest",
-          "configuration": {
-            "url": "[variables('dscConfigureSPVM').scriptFileUri]",
-            "script": "[variables('dscConfigureSPVM').script]",
-            "function": "[variables('dscConfigureSPVM').function]"
-          },
-          "configurationArguments": {
-            "DNSServer": "[variables('networkSettings').dcPrivateIPAddress]",
-            "DomainFQDN": "[parameters('domainFQDN')]",
-            "DCName": "[variables('generalSettings').vmDCName]",
-            "SQLName": "[variables('generalSettings').vmSQLName]",
-            "SQLAlias": "[variables('generalSettings').sqlAlias]",
-            "SharePointVersion": "2016",
-            "ConfigureADFS": "[parameters('configureADFS')]",
-            "EnableAnalysis": "[variables('generalSettings').enableAnalysis]"
-          },
-          "privacy": {
-            "dataCollection": "enable"
-          }
-        },
-        "protectedSettings": {
-          "configurationArguments": {
-            "DomainAdminCreds": {
-              "UserName": "[parameters('adminUserName')]",
-              "Password": "[parameters('adminPassword')]"
-            },
-            "SPSetupCreds": {
-              "UserName": "[variables('generalSettings').spSetupUserName]",
-              "Password": "[variables('generalSettings').spSetupPassword]"
-            },
-            "SPFarmCreds": {
-              "UserName": "[variables('generalSettings').spFarmUserName]",
-              "Password": "[variables('generalSettings').spFarmPassword]"
-            },
-            "SPAppPoolCreds": {
-              "UserName": "[variables('generalSettings').spAppPoolUserName]",
-              "Password": "[variables('generalSettings').spAppPoolPassword]"
-            },
-            "SPPassphraseCreds": {
-              "UserName": "Passphrase",
-              "Password": "[variables('generalSettings').spPassphrase]"
-            }
-          }
-        }
-      }
-    },
-    {
-      "condition": "[and(equals(parameters('provisionSharePoint2019'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "name": "[variables('vmSP2019').vmPublicIPName]",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "tags": {
-        "displayName": "[variables('vmSP2019').vmPublicIPName]"
-      },
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('vmSP2019').vmPublicIPDnsName]"
-        }
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2019'), true())]",
-      "name": "[variables('vmSP2019').vmNicName]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-02-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').vNetPrivateName)]",
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2019').vmPublicIPName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('vmSP2019').vmNicName]"
-      },
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('networkSettings').vNetPrivateName, variables('networkSettings').subnetSPName)]"
-              },
-              "publicIPAddress": "[if(parameters('addPublicIPAddressToEachVM'), variables('networkSettings').vmSP2019PublicIPNicAssociation, json('null'))]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2019'), true())]",
-      "name": "[variables('generalSettings').vmSP2019Name]",
-      "type": "Microsoft.Compute/virtualMachines",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2019').vmNicName)]"
-      ],
-      "tags": {
-        "displayName": "[variables('generalSettings').vmSP2019Name]"
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmSP2019').vmVmSize]"
-        },
-        "osProfile": {
-          "computerName": "[variables('generalSettings').vmSP2019Name]",
-          "adminUsername": "[variables('generalSettings').localAdminUserName]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "timeZone": "[parameters('vmsTimeZone')]",
-            "enableAutomaticUpdates": "[parameters('enableAutomaticUpdates')]",
-            "provisionVMAgent": true,
-            "patchSettings": {
-              "patchMode": "[if(parameters('enableAutomaticUpdates'), 'AutomaticByOS', 'Manual')]",
-              "assessmentMode": "ImageDefault"
-            }
-          }
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('vmSP2019').vmImagePublisher]",
-            "offer": "[variables('vmSP2019').vmImageOffer]",
-            "sku": "[variables('vmSP2019').vmImageSKU]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('vmSP2019').vmOSDiskName]",
-            "caching": "ReadWrite",
-            "osType": "Windows",
-            "createOption": "FromImage",
-            "diskSizeGB": 128,
-            "managedDisk": {
-              "storageAccountType": "[parameters('vmSPStorageAccountType')]"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSP2019').vmNicName)]"
-            }
-          ]
-        },
-        "licenseType": "[if(parameters('enableHybridBenefitServerLicenses'), 'Windows_Server', json('null'))]"
-      },
-      "resources": []
-    },
-    {
-      "condition": "[equals(parameters('provisionSharePoint2019'), true())]",
-      "name": "[concat(variables('generalSettings').vmSP2019Name, '/ConfigureSPVM')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[parameters('location')]",
-      "apiVersion": "2021-04-01",
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', variables('generalSettings').vmSP2019Name)]"
-      ],
-      "tags": {
-        "displayName": "[concat(variables('generalSettings').vmSP2019Name, '/ConfigureSPVM')]"
-      },
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "2.9",
-        "autoUpgradeMinorVersion": true,
-        "forceUpdateTag": "[variables('dscConfigureSPVM').forceUpdateTag]",
-        "settings": {
-          "wmfVersion": "latest",
-          "configuration": {
-            "url": "[variables('dscConfigureSPVM').scriptFileUri]",
-            "script": "[variables('dscConfigureSPVM').script]",
-            "function": "[variables('dscConfigureSPVM').function]"
-          },
-          "configurationArguments": {
-            "DNSServer": "[variables('networkSettings').dcPrivateIPAddress]",
-            "DomainFQDN": "[parameters('domainFQDN')]",
-            "DCName": "[variables('generalSettings').vmDCName]",
-            "SQLName": "[variables('generalSettings').vmSQLName]",
-            "SQLAlias": "[variables('generalSettings').sqlAlias]",
-            "SharePointVersion": "2019",
-            "ConfigureADFS": "[parameters('configureADFS')]",
-            "EnableAnalysis": "[variables('generalSettings').enableAnalysis]"
-          },
-          "privacy": {
-            "dataCollection": "enable"
-          }
-        },
-        "protectedSettings": {
-          "configurationArguments": {
-            "DomainAdminCreds": {
-              "UserName": "[parameters('adminUserName')]",
-              "Password": "[parameters('adminPassword')]"
-            },
-            "SPSetupCreds": {
-              "UserName": "[variables('generalSettings').spSetupUserName]",
-              "Password": "[variables('generalSettings').spSetupPassword]"
-            },
-            "SPFarmCreds": {
-              "UserName": "[variables('generalSettings').spFarmUserName]",
-              "Password": "[variables('generalSettings').spFarmPassword]"
-            },
-            "SPAppPoolCreds": {
-              "UserName": "[variables('generalSettings').spAppPoolUserName]",
-              "Password": "[variables('generalSettings').spAppPoolPassword]"
-            },
-            "SPPassphraseCreds": {
-              "UserName": "Passphrase",
-              "Password": "[variables('generalSettings').spPassphrase]"
-            }
-          }
-        }
-      }
-    },
-    {
+   {
       "condition": "[and(equals(parameters('provisionSharePointSubscription'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
       "name": "[variables('vmSPSubscription').vmPublicIPName]",
       "type": "Microsoft.Network/publicIPAddresses",
@@ -1752,30 +984,10 @@
       "type": "string",
       "value": "[variables('generalSettings').localAdminUserName]"
     },
-    "publicIPAddressSP2019": {
-      "condition": "[and(equals(parameters('provisionSharePoint2019'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2019').vmPublicIPName)).dnsSettings.fqdn]"
-    },
-    "publicIPAddressSP2016": {
-      "condition": "[and(equals(parameters('provisionSharePoint2016'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2016').vmPublicIPName)).dnsSettings.fqdn]"
-    },
-    "publicIPAddressSP2013": {
-      "condition": "[and(equals(parameters('provisionSharePoint2013'), true()), equals(parameters('addPublicIPAddressToEachVM'), true()))]",
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmSP2013').vmPublicIPName)).dnsSettings.fqdn]"
-    },
     "publicIPAddressSQL": {
       "condition": "[equals(parameters('addPublicIPAddressToEachVM'), true())]",
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmSQL').vmPublicIPName)).dnsSettings.fqdn]"
     },
-    "publicIPAddressDC": {
-      "condition": "[equals(parameters('addPublicIPAddressToEachVM'), true())]",
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmDC').vmPublicIPName)).dnsSettings.fqdn]"
-    }
-  }
+}
 }

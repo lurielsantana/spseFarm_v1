@@ -1,23 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
 trigger:
-- main
+- original
 
-pool:
-  vmImage: windows-latest
+stages:
+- stage: build
+  jobs:
+  - job: run_build
+    pool:
+      vmImage: 'windows-latest'
+    steps:
 
-jobs:
-  - job: createSPSESingleFarm
+    - task: CopyFiles@2
+      displayName: 'Copy scripts'
+      inputs:
+        contents: '**'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(Build.ArtifactStagingDirectory)
+        artifactName: armtemplate
+
+- stage: test
+  dependsOn: build
+  jobs:
+  - job: run_test
     timeoutInMinutes: 0
     cancelTimeoutInMinutes: 1
+    pool:
+      vmImage: 'windows-latest'
+
     steps:
+
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: armtemplate
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'ARM Conn'
-        subscriptionId: 'bed82fbc-918c-4d3c-915a-a571bec7ee87'
+        azureResourceManagerConnection: 'Assinatura do Visual Studio Enterprise – MPN(5)(8bc9e0b7-9ad7-4b73-aa86-c78a8cfe10b3)'
+        subscriptionId: '8bc9e0b7-9ad7-4b73-aa86-c78a8cfe10b3'
         action: 'Create Or Update Resource Group'
-        resourceGroupName: 'tjsprg'
+        resourceGroupName: 'azuretjsprg'
         location: 'East US'
-        templateLocation: 'URL of the file'
-        csmFileLink: 'https://raw.githubusercontent.com/macbgit/spseFarm_v1/main/azuredeploy.json'
-        csmParametersFileLink: 'https://raw.githubusercontent.com/macbgit/spseFarm_v1/main/azuredeploy.parameters.json'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(Pipeline.Workspace)/azuredeploy.json'
+        csmParametersFile: '$(Pipeline.Workspace)/azuredeploy.parameters.json'
         deploymentMode: 'Incremental'
