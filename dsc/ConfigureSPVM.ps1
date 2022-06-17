@@ -86,6 +86,46 @@ configuration ConfigureSPVM
 
         SqlAlias AddSqlAlias { Ensure = "Present"; Name = $SQLAlias; ServerName = $SQLName; Protocol = "TCP"; TcpPort= 1433 }
 
+
+        #**********************************************************
+        # Join AD forest
+        #**********************************************************
+        # If WaitForADDomain does not find the domain whtin "WaitTimeout" secs, it will signar a restart to DSC engine "RestartCount" times
+        WaitForADDomain WaitForDCReady
+        {
+            DomainName              = $DomainFQDN
+            WaitTimeout             = 1800
+            RestartCount            = 2
+            WaitForValidCredentials = $True
+            Credential              = $DomainAdminCredsQualified
+            DependsOn               = "[DnsServerAddress]SetDNS"
+        }
+
+        # WaitForADDomain sets reboot signal only if WaitForADDomain did not find domain within "WaitTimeout" secs
+        PendingReboot RebootOnSignalFromWaitForDCReady
+        {
+            Name             = "RebootOnSignalFromWaitForDCReady"
+            SkipCcmClientSDK = $true
+            DependsOn        = "[WaitForADDomain]WaitForDCReady"
+        }
+
+        Computer JoinDomain
+        {
+            Name       = $ComputerName
+            DomainName = $DomainFQDN
+            Credential = $DomainAdminCredsQualified
+            DependsOn  = "[PendingReboot]RebootOnSignalFromWaitForDCReady"
+        }
+
+        PendingReboot RebootOnSignalFromJoinDomain
+        {
+            Name             = "RebootOnSignalFromJoinDomain"
+            SkipCcmClientSDK = $true
+            DependsOn        = "[Computer]JoinDomain"
+        }
+        
+        # Scripts
+
         xScript DisableIESecurity
         {
             TestScript = {
@@ -205,26 +245,26 @@ configuration ConfigureSPVM
             InstallDir = "C:\Choco"
         }
 
-        #cChocoPackageInstaller InstallEdge
-        #{
-        #    Name                 = "microsoft-edge"
-        #    Ensure               = "Present"
-        #    DependsOn            = "[cChocoInstaller]InstallChoco"
-        #}
+        cChocoPackageInstaller InstallEdge
+        {
+            Name                 = "microsoft-edge"
+            Ensure               = "Present"
+            DependsOn            = "[cChocoInstaller]InstallChoco"
+        }
 
-        #cChocoPackageInstaller InstallNotepadpp
-        #{
-        #    Name                 = "notepadplusplus.install"
-        #    Ensure               = "Present"
-        #    DependsOn            = "[cChocoInstaller]InstallChoco"
-        #}
+        cChocoPackageInstaller InstallNotepadpp
+        {
+            Name                 = "notepadplusplus.install"
+            Ensure               = "Present"
+            DependsOn            = "[cChocoInstaller]InstallChoco"
+        }
 
-        #cChocoPackageInstaller Install7zip
-        #{
-        #    Name                 = "7zip.install"
-        #    Ensure               = "Present"
-        #    DependsOn            = "[cChocoInstaller]InstallChoco"
-        #}
+        cChocoPackageInstaller Install7zip
+        {
+            Name                 = "7zip.install"
+            Ensure               = "Present"
+            DependsOn            = "[cChocoInstaller]InstallChoco"
+        }
 
         cChocoPackageInstaller InstallVscode
         {
@@ -233,15 +273,15 @@ configuration ConfigureSPVM
             DependsOn            = "[cChocoInstaller]InstallChoco"
         }
 
-        # if ($EnableAnalysis) {
-        #     # This resource is for  of dsc logs only and totally optionnal
-        #     cChocoPackageInstaller InstallPython
-        #     {
-        #         Name                 = "python"
-        #         Ensure               = "Present"
-        #         DependsOn            = "[cChocoInstaller]InstallChoco"
-        #     }
-        # }
+         if ($EnableAnalysis) {
+             # This resource is for  of dsc logs only and totally optionnal
+             cChocoPackageInstaller InstallPython
+             {
+                 Name                 = "python"
+                 Ensure               = "Present"
+                 DependsOn            = "[cChocoInstaller]InstallChoco"
+             }
+         }
 
         if ($SharePointVersion -eq "Subscription") {
             #**********************************************************
@@ -300,43 +340,6 @@ configuration ConfigureSPVM
                 ProductKey       = "VW2FM-FN9FT-H22J4-WV9GT-H8VKF"
                 DependsOn        = "[SPInstallPrereqs]InstallPrerequisites"
             }
-        }
-
-        #**********************************************************
-        # Join AD forest
-        #**********************************************************
-        # If WaitForADDomain does not find the domain whtin "WaitTimeout" secs, it will signar a restart to DSC engine "RestartCount" times
-        WaitForADDomain WaitForDCReady
-        {
-            DomainName              = $DomainFQDN
-            WaitTimeout             = 1800
-            RestartCount            = 2
-            WaitForValidCredentials = $True
-            Credential              = $DomainAdminCredsQualified
-            DependsOn               = "[DnsServerAddress]SetDNS"
-        }
-
-        # WaitForADDomain sets reboot signal only if WaitForADDomain did not find domain within "WaitTimeout" secs
-        PendingReboot RebootOnSignalFromWaitForDCReady
-        {
-            Name             = "RebootOnSignalFromWaitForDCReady"
-            SkipCcmClientSDK = $true
-            DependsOn        = "[WaitForADDomain]WaitForDCReady"
-        }
-
-        Computer JoinDomain
-        {
-            Name       = $ComputerName
-            DomainName = $DomainFQDN
-            Credential = $DomainAdminCredsQualified
-            DependsOn  = "[PendingReboot]RebootOnSignalFromWaitForDCReady"
-        }
-
-        PendingReboot RebootOnSignalFromJoinDomain
-        {
-            Name             = "RebootOnSignalFromJoinDomain"
-            SkipCcmClientSDK = $true
-            DependsOn        = "[Computer]JoinDomain"
         }
 
         # This script is still needed
@@ -888,7 +891,7 @@ $SPAppPoolCreds = Get-Credential -Credential "spapppool"
 $SPPassphraseCreds = Get-Credential -Credential "Passphrase"
 $DNSServer = "10.0.0.4"
 $DomainFQDN = "redetjsp.local"
-$DCName = "DC"
+$DCName = "redetjsp.local"
 $SQLName = "SQL"
 $SQLAlias = "SQLAlias"
 $SharePointVersion = "Subscription"
