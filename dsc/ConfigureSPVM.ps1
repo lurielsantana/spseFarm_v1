@@ -90,7 +90,8 @@ configuration ConfigureSPVM
             SkipCcmClientSDK = $true
             DependsOn        = "[Computer]JoinDomain"
         }
-        
+
+    },
 
 
 <#
