@@ -1,0 +1,1 @@
+{"Modules":["ComputerManagementDsc","NetworkingDsc","ActiveDirectoryDsc","xCredSSP","xWebAdministration","SharePointDsc","xPSDesiredStateConfiguration","xDnsServer","CertificateDsc","SqlServerDsc","cChoco"]}
