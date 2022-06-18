@@ -5,7 +5,6 @@ configuration ConfigureSPVM
         [Parameter(Mandatory)] [String]$DNSServer,
         [Parameter(Mandatory)] [String]$DomainFQDN,
         [Parameter(Mandatory)] [System.Management.Automation.PSCredential]$DomainAdminCreds,
-        [Parameter(Mandatory)] [System.Management.Automation.PSCredential]$SPSetupCreds
     )
 
     Import-DscResource -ModuleName ComputerManagementDsc, NetworkingDsc, ActiveDirectoryDsc, xCredSSP, xWebAdministration, SharePointDsc, xPSDesiredStateConfiguration, xDnsServer, CertificateDsc, SqlServerDsc, cChoco
@@ -13,9 +12,8 @@ configuration ConfigureSPVM
     [String] $DomainNetbiosName = (Get-NetBIOSName -DomainFQDN $DomainFQDN)
     $Interface = Get-NetAdapter| Where-Object Name -Like "Ethernet*"| Select-Object -First 1
     $InterfaceAlias = $($Interface.Name)
-    [PSCredential] $DomainAdminCredsQualified = New-Object PSCredential ("${DomainNetbiosName}\$($DomainAdminCreds.UserName)", $DomainAdminCreds.Password)
- 
-    $ComputerName = Get-Content env:computername
+    [System.Management.Automation.PSCredential] $DomainAdminCredsQualified = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($DomainAdminCreds.UserName)", $DomainAdminCreds.Password)
+    [String] $ComputerName = Get-Content env:computername
 
     Node localhost
     {
