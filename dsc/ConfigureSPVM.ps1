@@ -4,7 +4,7 @@ configuration ConfigureSPVM
     (
         [Parameter(Mandatory)] [String]$DNSServer,
         [Parameter(Mandatory)] [String]$DomainFQDN,
-        [Parameter(Mandatory)] [System.Management.Automation.PSCredential]$DomainAdminCreds,
+        [Parameter(Mandatory)] [System.Management.Automation.PSCredential]$DomainAdminCreds
     )
 
     Import-DscResource -ModuleName ComputerManagementDsc, NetworkingDsc, ActiveDirectoryDsc, xCredSSP, xWebAdministration, SharePointDsc, xPSDesiredStateConfiguration, xDnsServer, CertificateDsc, SqlServerDsc, cChoco
