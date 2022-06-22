@@ -345,7 +345,7 @@ function WaitForSqlSetup
 Install-Module -Name SqlServerDsc
 
 help ConfigureSQLVM
-$DomainAdminCreds = Get-Credential -Credential "yvand"
+$DomainAdminCreds = Get-Credential -Credential "tjsp.sp"
 $SqlSvcCreds = Get-Credential -Credential "sqlsvc"
 $SPSetupCreds = Get-Credential -Credential "spsetup"
 $DNSServer = "10.0.0.4"
