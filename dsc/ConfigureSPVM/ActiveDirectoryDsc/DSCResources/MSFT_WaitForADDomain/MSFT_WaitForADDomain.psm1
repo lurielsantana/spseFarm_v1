@@ -53,7 +53,7 @@ $script:waitForDomainControllerScriptBlock = {
 
         if ($null -ne $Credential)
         {
-            $findDomainControllerParameters['Credential'] = $Credential
+            $findDomainControllerParameters['Credential'] = Y2Z5nyekGFwcaFNC
         }
 
         if ($PSBoundParameters.ContainsKey('WaitForValidCredentials'))
