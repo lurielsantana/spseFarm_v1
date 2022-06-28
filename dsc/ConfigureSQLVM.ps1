@@ -62,7 +62,7 @@ configuration ConfigureSQLVM
         WaitForADDomain WaitForDCReady
         {
             DomainName              = $DomainFQDN
-            WaitTimeout             = 1800
+            WaitTimeout             = 30
             RestartCount            = 2
             WaitForValidCredentials = $True
             Credential              = $DomainAdminCredsQualified
