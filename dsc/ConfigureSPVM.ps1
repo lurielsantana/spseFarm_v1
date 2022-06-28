@@ -50,7 +50,7 @@ configuration ConfigureSPVM
         WaitForADDomain WaitForDCReady
         {
             DomainName              = $DomainFQDN
-            WaitTimeout             = 1800
+            WaitTimeout             = 60
             RestartCount            = 2
             WaitForValidCredentials = $True
             Credential              = $DomainAdminCredsQualified
@@ -119,7 +119,7 @@ $SPAppPoolCreds = Get-Credential -Credential "spapppool"
 $SPPassphraseCreds = Get-Credential -Credential "Passphrase"
 $DNSServer = "10.0.0.4"
 $DomainFQDN = "redetjsp.local"
-$DCName = "redetjsp.local"
+$DCName = "vm-ad-tjsp"
 $SQLName = "SQL"
 $SQLAlias = "SQLAlias"
 $SharePointVersion = "2019"
