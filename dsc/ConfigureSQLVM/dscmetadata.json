@@ -1,0 +1,1 @@
+{"Modules":["ComputerManagementDsc","NetworkingDsc","ActiveDirectoryDsc","SqlServerDsc","xPSDesiredStateConfiguration"]}
