@@ -58,25 +58,6 @@ configuration ConfigureSQLVM
         #**********************************************************
         # Join AD forest
         #**********************************************************
-        # If WaitForADDomain does not find the domain whtin "WaitTimeout" secs, it will signar a restart to DSC engine "RestartCount" times
-        WaitForADDomain WaitForDCReady
-        {
-            DomainName              = $DomainFQDN
-            WaitTimeout             = 30
-            RestartCount            = 2
-            WaitForValidCredentials = $True
-            Credential              = $DomainAdminCredsQualified
-            DependsOn               = "[DnsServerAddress]SetDNS"
-        }
-
-        # WaitForADDomain sets reboot signal only if WaitForADDomain did not find domain within "WaitTimeout" secs
-        PendingReboot RebootOnSignalFromWaitForDCReady
-        {
-            Name             = "RebootOnSignalFromWaitForDCReady"
-            SkipCcmClientSDK = $true
-            DependsOn        = "[WaitForADDomain]WaitForDCReady"
-        }
-
         Computer JoinDomain
         {
             Name       = $ComputerName
@@ -343,16 +324,13 @@ function WaitForSqlSetup
 # Azure DSC extension logging: C:\WindowsAzure\Logs\Plugins\Microsoft.Powershell.DSC\2.21.0.0
 # Azure DSC extension configuration: C:\Packages\Plugins\Microsoft.Powershell.DSC\2.21.0.0\DSCWork
 Install-Module -Name SqlServerDsc
-
 help ConfigureSQLVM
 $DomainAdminCreds = Get-Credential -Credential "yvand"
 $SqlSvcCreds = Get-Credential -Credential "sqlsvc"
 $SPSetupCreds = Get-Credential -Credential "spsetup"
 $DNSServer = "10.1.1.4"
 $DomainFQDN = "contoso.local"
-
 $outputPath = "C:\Packages\Plugins\Microsoft.Powershell.DSC\2.83.1.0\DSCWork\ConfigureSQLVM.0"
 ConfigureSQLVM -DNSServer $DNSServer -DomainFQDN $DomainFQDN -DomainAdminCreds $DomainAdminCreds -SqlSvcCreds $SqlSvcCreds -SPSetupCreds $SPSetupCreds -ConfigurationData @{AllNodes=@(@{ NodeName="localhost"; PSDscAllowPlainTextPassword=$true })} -OutputPath $outputPath
 Start-DscConfiguration -Path $outputPath -Wait -Verbose -Force
-
 #>
