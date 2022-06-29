@@ -20,10 +20,10 @@ configuration ConfigureSPVM
     [String] $DomainNetbiosName = (Get-NetBIOSName -DomainFQDN $DomainFQDN)
     $Interface = Get-NetAdapter| Where-Object Name -Like "Ethernet*"| Select-Object -First 1
     $InterfaceAlias = $($Interface.Name)
-    [System.Management.Automation.PSCredential] $DomainAdminCredsQualified = New-Object System.Management.Automation.PSCredential ("$DomainAdminCreds.UserName", $DomainAdminCreds.Password)
-    [System.Management.Automation.PSCredential] $SPSetupCredsQualified = New-Object System.Management.Automation.PSCredential ("$SPSetupCreds.UserName", $SPSetupCreds.Password)
-    [System.Management.Automation.PSCredential] $SPFarmCredsQualified = New-Object System.Management.Automation.PSCredential ("$SPFarmCreds.UserName", $SPFarmCreds.Password)
-    [System.Management.Automation.PSCredential] $SPAppPoolCredsQualified = New-Object System.Management.Automation.PSCredential ("$SPAppPoolCreds.UserName", $SPAppPoolCreds.Password)
+    [System.Management.Automation.PSCredential] $DomainAdminCredsQualified = New-Object System.Management.Automation.PSCredential ($DomainAdminCreds.UserName, $DomainAdminCreds.Password)
+    [System.Management.Automation.PSCredential] $SPSetupCredsQualified = New-Object System.Management.Automation.PSCredential ($SPSetupCreds.UserName, $SPSetupCreds.Password)
+    [System.Management.Automation.PSCredential] $SPFarmCredsQualified = New-Object System.Management.Automation.PSCredential ($SPFarmCreds.UserName, $SPFarmCreds.Password)
+    [System.Management.Automation.PSCredential] $SPAppPoolCredsQualified = New-Object System.Management.Automation.PSCredential ($SPAppPoolCreds.UserName, $SPAppPoolCreds.Password)
     [String] $SPDBPrefix = "SP$($SharePointVersion)_"
     [String] $SPTrustedSitesName = "spsites$SharePointVersion"
     [String] $ComputerName = Get-Content env:computername
