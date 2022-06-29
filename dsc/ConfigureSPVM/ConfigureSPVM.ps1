@@ -298,7 +298,6 @@ configuration ConfigureSPVM
             Name       = $ComputerName
             DomainName = $DomainFQDN
             Credential = $DomainAdminCredsQualified
-            DependsOn  = "[PendingReboot]RebootOnSignalFromWaitForDCReady"
         }
 
         PendingReboot RebootOnSignalFromJoinDomain
